@@ -1,0 +1,160 @@
+/* robertursua.com: a descent from altitude to the sea floor. One page, one 3D scene (scene.js), no external requests. */
+
+:root {
+  --ink: #f4f6f8;
+  --soft: rgba(244, 246, 248, 0.78);
+  --faint: rgba(244, 246, 248, 0.5);
+  --line: rgba(244, 246, 248, 0.28);
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "JetBrains Mono", Consolas, Menlo, monospace;
+  --gutter: clamp(1.25rem, 4.2vw, 3.5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: #77808b; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Without WebGL the page keeps the same idea as a plain gradient: sky at the top, deep water at the bottom. */
+body {
+  margin: 0;
+  color: var(--ink);
+  font: 1rem/1.6 var(--sans);
+  background: linear-gradient(180deg, #77808b 0%, #8a929c 16%, #7b848e 30%, #7f8790 50%, #334852 58%, #15222b 80%, #0a1117 100%);
+}
+
+a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+
+.skip { position: fixed; left: -999rem; top: 0; z-index: 20; padding: 0.6rem 1rem; background: #0a1117; color: var(--ink); }
+.skip:focus { left: 0; }
+
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; opacity: 0; transition: opacity 1.2s ease; }
+.gl #scene { opacity: 1; }
+
+/* Darkens the text side and the corners so white type stays readable over the bright sky. */
+.scrim {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(8, 12, 16, 0.55) 0%, rgba(8, 12, 16, 0.3) 30%, rgba(8, 12, 16, 0) 58%),
+    radial-gradient(ellipse at 60% 50%, rgba(8, 12, 16, 0) 45%, rgba(8, 12, 16, 0.42) 100%);
+}
+
+/* Fixed corner readouts */
+.hud {
+  position: fixed; z-index: 3; margin: 0;
+  font: 0.72rem/1.55 var(--mono); letter-spacing: 0.04em; color: var(--soft);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+.hud p { margin: 0; }
+.hud-tl { top: var(--gutter); left: var(--gutter); }
+.brand {
+  display: inline-block; margin-bottom: 0.7rem;
+  font: 800 1.35rem/1 var(--sans); letter-spacing: 0.01em; text-transform: uppercase; text-decoration: none; color: var(--ink);
+}
+.hud-tr { top: var(--gutter); right: var(--gutter); width: 15.5rem; text-align: right; }
+.hud .hud-title { margin-bottom: 0.9rem; color: var(--ink); }
+.hud-nav { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.4rem; }
+.hud-nav a { text-decoration: none; color: var(--faint); transition: color 0.3s; }
+.hud-nav a::after { content: ""; display: inline-block; width: 0.9rem; height: 1px; margin-left: 0.6rem; vertical-align: middle; background: currentColor; transition: width 0.3s; }
+.hud-nav a:hover, .hud-nav a.on { color: var(--ink); }
+.hud-nav a.on::after { width: 2.2rem; }
+.hud-bl { bottom: var(--gutter); left: var(--gutter); color: var(--ink); transition: opacity 0.6s; }
+.hud-bl.gone { opacity: 0; }
+.hud-br { bottom: var(--gutter); right: var(--gutter); text-align: right; }
+#alt { color: var(--ink); font-size: 0.82rem; }
+
+/* Labels pinned to objects in the scene; positioned by scene.js */
+.tags { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.tag {
+  position: absolute; left: 0; top: 0; opacity: 0; will-change: transform, opacity;
+  padding-left: 3.4rem;
+  font: 0.68rem/1.5 var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--soft);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5); white-space: nowrap;
+}
+.tag::before { content: ""; position: absolute; left: 0; top: 0.5rem; width: 2.8rem; height: 1px; background: var(--line); }
+.tag::after { content: ""; position: absolute; left: -3px; top: calc(0.5rem - 3px); width: 7px; height: 7px; border: 1px solid var(--ink); border-radius: 50%; }
+.tag b { display: block; font-weight: 400; color: var(--ink); }
+.tag span { display: block; }
+/* bare numbers on the pipeline sources: just the ring and the digits */
+.tag.num { padding-left: 0.75rem; color: var(--ink); }
+.tag.num::before { display: none; }
+
+/* a fine film grain over everything, so the flat greys feel less digital */
+.grain {
+  position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0.11; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1.2 -0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Chapters */
+main { position: relative; z-index: 2; }
+.chapter { min-height: 150vh; display: flex; align-items: center; padding: 9rem var(--gutter) 4rem; }
+.chapter.hero { min-height: 100vh; min-height: 100svh; align-items: flex-end; padding-bottom: calc(var(--gutter) + 5.5rem); }
+.chapter.last { min-height: 100vh; min-height: 100svh; }
+.panel { width: min(33rem, 100%); text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4); }
+
+/* scene.js fades each block by its position on screen; nothing is hidden when the script is not running. */
+.js .panel > * { opacity: 0; will-change: opacity; }
+
+.kicker { margin: 0 0 1.1rem; font: 0.74rem/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+h1, h2 { margin: 0; font-weight: 300; letter-spacing: -0.02em; text-wrap: balance; }
+h1 { font-size: clamp(2.2rem, 5.2vw, 4.1rem); line-height: 1.04; max-width: 15ch; }
+h2 { font-size: clamp(1.8rem, 3.6vw, 2.7rem); line-height: 1.08; }
+h2 + p:not(.where) { margin-top: 1.1rem; }
+.lede { margin: 1.5rem 0 0; font-size: 1.08rem; color: var(--soft); }
+.where { margin: 0.9rem 0 1.4rem; font: 0.72rem/1.6 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); }
+main p { margin: 0 0 1.2rem; }
+main .panel > :last-child { margin-bottom: 0; }
+
+.stats { list-style: none; margin: 1.8rem 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; border-top: 1px solid var(--line); }
+.stats li { padding-top: 0.9rem; }
+.stats b { display: block; font: 300 2rem/1 var(--sans); letter-spacing: -0.02em; }
+.stats span { display: block; margin-top: 0.55rem; font: 0.68rem/1.55 var(--mono); letter-spacing: 0.03em; color: var(--soft); }
+
+.points { list-style: none; margin: 0 0 1.4rem; padding: 0; }
+.points li { position: relative; padding: 0.55rem 0 0.55rem 1.6rem; border-top: 1px solid var(--line); font-size: 0.95rem; color: var(--soft); }
+.points li::before { content: "//"; position: absolute; left: 0; top: 0.72rem; font: 0.7rem/1.5 var(--mono); color: var(--faint); }
+
+.creds { list-style: none; margin: 1.6rem 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 1.5rem; }
+.creds li { padding: 0.75rem 0; border-top: 1px solid var(--line); }
+.creds b { display: block; font-weight: 400; font-size: 0.98rem; line-height: 1.3; }
+.creds span { display: block; margin-top: 0.3rem; font: 0.68rem/1.5 var(--mono); letter-spacing: 0.03em; color: var(--soft); }
+
+.stack, .aside, .copy { font: 0.72rem/1.7 var(--mono); letter-spacing: 0.04em; color: var(--soft); }
+.aside { padding-top: 0.9rem; border-top: 1px solid var(--line); }
+.copy { margin-top: 3rem; color: var(--faint); }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-top: 1.8rem; }
+.button { display: inline-block; padding: 0.8rem 1.4rem; border: 1px solid var(--ink); text-decoration: none; font: 0.76rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.25s, color 0.25s; }
+.button:hover { background: var(--ink); color: #0a1117; text-shadow: none; }
+.link { font: 0.76rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* Short laptop screens: tighten the panels so a whole chapter fits under the corner readouts. */
+@media (max-height: 52rem) and (min-width: 56.01rem) {
+  body { font-size: 0.94rem; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+  .where { margin-bottom: 1rem; }
+  .stats { margin: 1.2rem 0; }
+  .stats b { font-size: 1.6rem; }
+  .points { margin-bottom: 1rem; }
+  .points li { padding-top: 0.4rem; padding-bottom: 0.4rem; font-size: 0.88rem; }
+  .creds { margin: 1.1rem 0; }
+}
+
+/* Narrow screens: the scene sits behind full-width text, so the scrim is even and the extra readouts go. */
+@media (max-width: 56rem) {
+  .hud-tr, .tags, .hud-nav { display: none; }
+  /* dark bands behind the top and bottom readouts, so text scrolling past them stays legible */
+  .hud-tl::before, .hud-br::before { content: ""; position: fixed; left: 0; right: 0; z-index: -1; pointer-events: none; }
+  .hud-tl::before { top: 0; height: 8rem; background: linear-gradient(to bottom, rgba(8, 12, 16, 0.88) 35%, rgba(8, 12, 16, 0)); }
+  .hud-br::before { bottom: 0; height: 6.5rem; background: linear-gradient(to top, rgba(8, 12, 16, 0.88) 35%, rgba(8, 12, 16, 0)); }
+  .scrim { background: rgba(8, 12, 16, 0.46); }
+  .chapter { min-height: 130vh; }
+  .stats b { font-size: 1.6rem; }
+}
+@media (max-width: 30rem) {
+  .stats, .creds { grid-template-columns: 1fr; gap: 0; }
+  .stats li { display: grid; grid-template-columns: 4.5rem 1fr; align-items: baseline; padding: 0.8rem 0; border-top: 1px solid var(--line); }
+  .stats { border-top: 0; }
+  .stats span { margin-top: 0; }
+}

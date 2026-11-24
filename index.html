@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robert Ursua</title>
+<meta name="description" content="Robert Ursua: project manager and data platform owner at Ericsson, computer engineer and U.S. Navy EOD veteran near Austin, Texas.">
+<link rel="canonical" href="https://robertursua.com/">
+<meta property="og:title" content="Robert Ursua">
+<meta property="og:description" content="Project manager. Computer engineer. Navy EOD veteran.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://robertursua.com/">
+<meta name="theme-color" content="#77808b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2315222b'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-weight='800' font-size='28' fill='%23f4f6f8' text-anchor='middle'%3ERU%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- The 3D scene sits behind everything; the page is fully readable without it. -->
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="scrim" aria-hidden="true"></div>
+
+<header class="hud hud-tl">
+  <a class="brand" href="#top">Robert Ursua</a>
+  <p>// Project Manager, Ericsson</p>
+  <p>// Austin, Texas</p>
+</header>
+
+<aside class="hud hud-tr" aria-label="Profile">
+  <p class="hud-title">////// Profile</p>
+  <p>This page runs from where I am now down to where I started: altitude at the top, the sea floor at the bottom.</p>
+</aside>
+
+<p class="hud hud-bl" id="hint" aria-hidden="true">Scroll down to<br>descend.</p>
+
+<div class="hud hud-br">
+  <nav class="hud-nav" aria-label="Chapters">
+    <a href="#ericsson" data-nav="1">01 Ericsson</a>
+    <a href="#education" data-nav="2">02 Education</a>
+    <a href="#navy" data-nav="3">03 U.S. Navy</a>
+    <a href="#contact" data-nav="4">04 Contact</a>
+  </nav>
+  <p id="alt" aria-hidden="true">ALT 3,500 FT</p>
+  <p id="chap" aria-hidden="true">00 / NOW</p>
+</div>
+
+<!-- Annotations pinned to objects in the scene (decorative; the same facts are in the text). -->
+<div class="tags" aria-hidden="true">
+  <div class="tag" data-tag="plane"><b>N18LW / Cessna 172 Skyhawk</b><span>Private Pilot, 2025</span></div>
+  <div class="tag" data-tag="core"><b>07 pipelines / 01 warehouse</b><span>Nightly, unattended</span></div>
+  <div class="tag" data-tag="post"><b>UTSA / Division I football</b><span>B.S. Computer Engineering, 2021</span></div>
+  <div class="tag" data-tag="mine"><b>EOD Mobile Unit Five</b><span>Naval Base Guam, 2008 to 2014</span></div>
+  <div class="tag" data-tag="rov"><b>Remotely operated vehicle</b><span>Ordnance recovery</span></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<main id="main">
+  <section class="chapter hero" id="top" data-chapter="0">
+    <div class="panel">
+      <p class="kicker" data-scramble>////// Robert Ursua</p>
+      <h1>Project manager. Computer engineer. Navy EOD veteran.</h1>
+      <p class="lede">I own the data platform behind Ericsson's Silicon Performance Engineering organization. Before that I spent six years disposing of explosive ordnance for the U.S. Navy, on land and underwater. In 2025 I earned my private pilot certificate.</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="ericsson" data-chapter="1" aria-labelledby="ericsson-h">
+    <div class="panel">
+      <p class="kicker" data-scramble>01 // 2022 to present</p>
+      <h2 id="ericsson-h">Project Manager, SPE Data Platform</h2>
+      <p class="where">Ericsson / Central Engineering, Strategy &amp; Operations / Austin, Texas</p>
+      <p>I'm the project manager and platform owner for the Silicon Performance Engineering data platform. I design, run and support the automated pipelines and decision dashboards that Central Engineering leadership relies on, and I led the move of the organization's work tracking into a single Jira project.</p>
+      <ul class="stats">
+        <li><b>07</b><span>production pipelines into one PostgreSQL warehouse, every night, unattended</span></li>
+        <li><b>38x</b><span>faster resource-planning load after a rebuild, with no partial-load data loss</span></li>
+        <li><b>04</b><span>leadership dashboards: budget, headcount, resource allocation and Jira</span></li>
+      </ul>
+      <ul class="points">
+        <li>Added failure alerts and a daily heartbeat, so a missed nightly run is noticed the same day.</li>
+        <li>Replaced the Power BI budget dashboard with a self-contained, offline HTML dashboard delivered by email every week.</li>
+        <li>Led the Jira consolidation and wrote its adoption package: executive brief, operating model, deck and team playbook.</li>
+      </ul>
+      <p class="stack">Python / PostgreSQL / SQL / Snowflake / Linux / Git / Jira</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="education" data-chapter="2" aria-labelledby="education-h">
+    <div class="panel">
+      <p class="kicker" data-scramble>02 // 2016 to 2023</p>
+      <h2 id="education-h">Computer engineering and Division I football</h2>
+      <p class="where">University of Texas at San Antonio</p>
+      <p>I earned a B.S. in Computer Engineering at UTSA in 2021 on a Division I football scholarship. An associate degree in science and mathematics at Palomar College came first, and a project management certificate from the University of Texas at Austin followed in 2023.</p>
+      <ul class="creds">
+        <li><b>B.S. Computer Engineering</b><span>University of Texas at San Antonio, 2021</span></li>
+        <li><b>Project Management Certificate</b><span>University of Texas at Austin, 2023</span></li>
+        <li><b>A.S. Science and Mathematics</b><span>Palomar College, 2016</span></li>
+        <li><b>Private Pilot</b><span>2025</span></li>
+      </ul>
+      <p class="aside">2021 / Maintenance Diver, SeaWorld San Antonio. I supervised SCUBA dives to maintain the park's marine mammal life-support equipment.</p>
+    </div>
+  </section>
+
+  <section class="chapter" id="navy" data-chapter="3" aria-labelledby="navy-h">
+    <div class="panel">
+      <p class="kicker" data-scramble>03 // 2008 to 2014</p>
+      <h2 id="navy-h">Explosive Ordnance Disposal Technician</h2>
+      <p class="where">U.S. Navy / EOD Mobile Unit Five / Naval Base Guam</p>
+      <p>As a Petty Officer Second Class I identified, rendered safe and disposed of explosive hazards, from conventional ordnance and improvised devices to underwater threats. I supervised junior Sailors during recovery and demolition operations. On one operation I located and recovered jettisoned ordnance with a remotely operated vehicle, protecting the Great Barrier Reef.</p>
+      <ul class="stats">
+        <li><b>06</b><span>years of service</span></li>
+        <li><b>$10M</b><span>of life-support equipment kept ready</span></li>
+        <li><b>02</b><span>Navy and Marine Corps Achievement Medals, 2011 and 2013</span></li>
+      </ul>
+      <p class="stack">Advanced NAUI SCUBA, Naval Diving and Salvage Training Center, 2009</p>
+    </div>
+  </section>
+
+  <section class="chapter last" id="contact" data-chapter="4" aria-labelledby="contact-h">
+    <div class="panel">
+      <p class="kicker" data-scramble>04 // Contact</p>
+      <h2 id="contact-h">Reach me</h2>
+      <p>The best way to reach me is on LinkedIn.</p>
+      <p class="actions">
+        <a class="button" href="https://www.linkedin.com/in/robert-ursua" rel="me noopener">LinkedIn</a>
+        <a class="link" href="#top">Return to the surface</a>
+      </p>
+      <p class="copy">&copy; 2026 Robert Ursua</p>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="scene.js"></script>
+</body>
+</html>
